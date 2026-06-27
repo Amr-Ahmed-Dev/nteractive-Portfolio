@@ -353,7 +353,7 @@ window.addEventListener("scroll", function () {
       scrollTopButtom.classList.remove("opacity-0", "invisible");
       scrollTopButtom.classList.add("opacity-100", "visible");
     } else {
-      scrollTopButtom.classList.remove("opacity-110", "visible");
+      scrollTopButtom.classList.remove("opacity-100", "visible");
       scrollTopButtom.classList.add("opacity-0", "invisible");
     }
   }
