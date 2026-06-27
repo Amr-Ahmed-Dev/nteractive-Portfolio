@@ -78,15 +78,60 @@ for (var i = 0; i < tabs.length; i++) {
   tabs[i].addEventListener("click", function () {
     var filterValue = this.getAttribute("data-filter");
 
-    for (var j = 0; j < allProjects.length; j++) {
-      var project = allProjects[j];
-      var projectCategory = project.getAttribute("data-category");
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].setAttribute("data-active", "false");
+    }
 
-      if (filterValue === "all" || projectCategory === filterValue) {
-        project.classList.remove("hidden");
-      } else {
-        project.classList.add("hidden");
-      }
+    this.setAttribute("data-active", "true");
+
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].addEventListener("click", function () {
+        var filterValue = this.getAttribute("data-filter");
+
+        // reset tabs
+        for (var t = 0; t < tabs.length; t++) {
+          tabs[t].setAttribute("data-active", "false");
+        }
+        this.setAttribute("data-active", "true");
+
+        // الأول اعمل أنيميشن للخروج
+        for (var j = 0; j < allProjects.length; j++) {
+          var project = allProjects[j];
+          if (!project.classList.contains("hidden")) {
+            project.classList.add("hiding");
+          }
+        }
+
+        // بعد ما يخرجوا، ورّي الجدد
+        setTimeout(
+          (function (filter) {
+            return function () {
+              for (var j = 0; j < allProjects.length; j++) {
+                var project = allProjects[j];
+                var projectCategory = project.getAttribute("data-category");
+
+                project.classList.remove("hiding");
+
+                if (filter === "all" || projectCategory === filter) {
+                  project.classList.remove("hidden");
+                  project.classList.add("showing");
+
+                  // شيل showing بعد ما الأنيميشن تخلص
+                  (function (el) {
+                    setTimeout(function () {
+                      el.classList.remove("showing");
+                    }, 500);
+                  })(project);
+                } else {
+                  project.classList.add("hidden");
+                  project.classList.remove("showing");
+                }
+              }
+            };
+          })(filterValue),
+          400,
+        ); // ← نفس وقت أنيميشن الخروج
+      });
     }
   });
 }
@@ -101,14 +146,17 @@ var currentSlide = 0;
 
 function updateSlider() {
   var amountToMove = currentSlide * (100 / 3);
-
   carouselTrack.style.transform = "translateX(+" + amountToMove + "%)";
 
   for (var k = 0; k < indicators.length; k++) {
     if (k === currentSlide) {
       indicators[k].setAttribute("aria-selected", "true");
+      indicators[k].classList.remove("bg-slate-400", "dark:bg-slate-600");
+      indicators[k].classList.add("bg-accent"); // ← Active style
     } else {
       indicators[k].setAttribute("aria-selected", "false");
+      indicators[k].classList.remove("bg-accent", "w-6");
+      indicators[k].classList.add("bg-slate-400", "dark:bg-slate-600");
     }
   }
 }
